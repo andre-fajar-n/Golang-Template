@@ -1,0 +1,51 @@
+definitions:
+  ModelTrackTime:
+    type: object
+    properties:
+      created_at:
+        type: integer
+        format: date-time
+        x-omitempty: false
+        x-go-custom-tag: gorm:"type:int;autoCreateTime"
+      updated_at:
+        type: integer
+        format: date-time
+        x-omitempty: false
+        x-go-custom-tag: gorm:"type:int;autoUpdateTime"
+
+  ModelIdentifier:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: integer
+        format: uint64
+        x-go-custom-tag: gorm:"type:int auto_increment;primaryKey"
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+        example: 'error'
+
+  Success:
+    type: object
+    properties:
+      message:
+        type: string
+
+  Metadata:
+    type: object
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_row:
+        type: integer
+      total_page:
+        type: integer

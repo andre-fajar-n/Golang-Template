@@ -1,0 +1,29 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: application-tracker
+schemes: [http]
+consumes: [application/json, multipart/form-data]
+produces: [application/json]
+securityDefinitions:
+  key:
+    type: apiKey
+    in: header
+    name: Authorization
+
+paths:
+  # health
+  /health:
+    $ref: ./path/v1/health/health.yml
+
+definitions:
+  principal:
+    type: object
+    properties:
+      email:
+        type: string
+      user_id:
+        type: number
+        format: uint64
+      expired_at:
+        type: string

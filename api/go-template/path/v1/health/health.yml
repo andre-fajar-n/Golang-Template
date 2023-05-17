@@ -1,0 +1,15 @@
+get:
+  tags: [health]
+  summary: 'Health Check'
+  description: 'Check if the App is Running'
+  operationId: health
+  security: []
+  responses:
+    200:
+      description: 'Health Check'
+      schema:
+        $ref: './../../../definitions/common.yml#/definitions/Success'
+    default:
+      schema:
+        $ref: './../../../definitions/common.yml#/definitions/Error'
+      description: Server Error

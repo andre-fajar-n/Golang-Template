@@ -1,0 +1,26 @@
+parameters:
+  page_pagination:
+    description: default parameter for pagination page
+    name: page
+    in: query
+    type: integer
+    default: 1
+  limit_pagination:
+    description: default parameter for limit pagination
+    name: limit
+    in: query
+    type: integer
+    default: 10
+  order_pagination:
+    description: default parameter for order pagination
+    name: order
+    in: query
+    type: string
+    default: 'created_at'
+  sort_pagination:
+    description: default parameter for sort pagination
+    name: sort
+    in: query
+    type: string
+    enum: [asc, desc]
+    default: 'desc'
