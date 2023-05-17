@@ -1,6 +1,0 @@
--- INSERT INTO "roles" (slug, name) VALUES ('super-admin', 'SUPER ADMIN'),
--- ('admin-partner', 'ADMIN PARTNER'),
--- ('driver-personal', 'DRIVER PERSONAL'),
--- ('driver-corporate', 'DRIVER CORPORATE'),
--- ('customer-personal', 'CUSTOMER PERSONAL'),
--- ('customer-corporate', 'CUSTOMER CORPORATE');

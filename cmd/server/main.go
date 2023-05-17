@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_template"
 	"go_template/gen/restapi"
 	"go_template/gen/restapi/operations"
 	"go_template/internal/handlers"
 	"go_template/internal/rest"
+	"go_template/runtime"
 	"log"
 	"os"
 
@@ -62,7 +62,7 @@ func main() {
 		os.Exit(code)
 	}
 
-	rt := go_template.NewRuntime()
+	rt := runtime.NewRuntime()
 
 	h := handlers.NewHandler()
 

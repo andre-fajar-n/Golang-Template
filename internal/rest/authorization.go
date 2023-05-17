@@ -1,16 +1,16 @@
 package rest
 
 import (
-	"go_template"
 	"go_template/gen/models"
 	"go_template/gen/restapi/operations"
 	"go_template/internal/utils/jwt"
+	"go_template/runtime"
 	"time"
 
 	"github.com/go-openapi/errors"
 )
 
-func parseToken(rt *go_template.Runtime, token string) (*jwt.Payload, error) {
+func parseToken(rt *runtime.Runtime, token string) (*jwt.Payload, error) {
 	secret := rt.Cfg.JwtSecret
 	maker, err := jwt.NewJWTMaker(secret)
 	if err != nil {
@@ -37,7 +37,7 @@ func verifySingleRole(payload *jwt.Payload, role string) (*models.Principal, err
 	}, nil
 }
 
-func checkHasRole(rt *go_template.Runtime, role, token string) (*models.Principal, error) {
+func checkHasRole(rt *runtime.Runtime, role, token string) (*models.Principal, error) {
 	payload, err := parseToken(rt, token)
 	if err != nil {
 		return nil, err
@@ -51,6 +51,6 @@ func checkHasRole(rt *go_template.Runtime, role, token string) (*models.Principa
 	return p, nil
 }
 
-func Authorization(rt *go_template.Runtime, api *operations.ServerAPI) {
+func Authorization(rt *runtime.Runtime, api *operations.ServerAPI) {
 
 }
