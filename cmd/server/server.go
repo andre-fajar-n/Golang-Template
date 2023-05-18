@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ var mainFlags = struct {
 	AppConfig string `long:"config" description:"Main application configuration YAML path"`
 }{}
 
-func main() {
+func Main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 
 	swaggerSpec, err := loads.Analyzed(restapi.SwaggerJSON, "")
@@ -78,7 +78,7 @@ func main() {
 	}
 
 	handler := alice.New(
-		middlewares.NewRecoveryMW("application-tracker", nil),
+		middlewares.NewRecoveryMW("golang-template", nil),
 		middlewares.NewProfiler,
 	).Then(api.Serve(nil))
 

@@ -12,10 +12,6 @@ info:
 paths:
     /health:
         get:
-            security: []
-            description: Check if the App is Running
-            tags:
-                - health
             summary: Health Check
             operationId: health
             responses:
@@ -29,13 +25,17 @@ paths:
                 default:
                     description: Server Error
                     schema:
-                        type: object
                         properties:
                             code:
                                 type: integer
                             message:
                                 type: string
                                 example: error
+                        type: object
+            security: []
+            description: Check if the App is Running
+            tags:
+                - health
 definitions:
     principal:
         type: object
@@ -49,6 +49,6 @@ definitions:
                 format: uint64
 securityDefinitions:
     key:
-        in: header
         type: apiKey
         name: Authorization
+        in: header

@@ -20,7 +20,5 @@ func NewRuntime() *Runtime {
 
 	rt = rt.db()
 
-	rt.runMigration()
-
 	return rt
 }
