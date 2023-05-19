@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"go_template/gen/models"
 )
 
 // HealthOKCode is the HTTP code returned for type HealthOK
@@ -24,7 +26,7 @@ type HealthOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *HealthOKBody `json:"body,omitempty"`
+	Payload *models.Success `json:"body,omitempty"`
 }
 
 // NewHealthOK creates HealthOK with default headers values
@@ -34,13 +36,13 @@ func NewHealthOK() *HealthOK {
 }
 
 // WithPayload adds the payload to the health o k response
-func (o *HealthOK) WithPayload(payload *HealthOKBody) *HealthOK {
+func (o *HealthOK) WithPayload(payload *models.Success) *HealthOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the health o k response
-func (o *HealthOK) SetPayload(payload *HealthOKBody) {
+func (o *HealthOK) SetPayload(payload *models.Success) {
 	o.Payload = payload
 }
 
@@ -67,7 +69,7 @@ type HealthDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *HealthDefaultBody `json:"body,omitempty"`
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewHealthDefault creates HealthDefault with default headers values
@@ -93,13 +95,13 @@ func (o *HealthDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the health default response
-func (o *HealthDefault) WithPayload(payload *HealthDefaultBody) *HealthDefault {
+func (o *HealthDefault) WithPayload(payload *models.Error) *HealthDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the health default response
-func (o *HealthDefault) SetPayload(payload *HealthDefaultBody) {
+func (o *HealthDefault) SetPayload(payload *models.Error) {
 	o.Payload = payload
 }
 

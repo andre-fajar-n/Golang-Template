@@ -14,19 +14,17 @@ var (
 // Payload contains the payload data of the token
 type Payload struct {
 	UserID    uint64    `json:"user_id"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
+	Username  string    `json:"username"`
 	IssuedAt  time.Time `json:"issued_at"`
 	ExpiredAt time.Time `json:"expired_at"`
 }
 
 // NewPayload creates a new token payload with a specific username and duration
-func NewPayload(userID uint64, email, role string, duration time.Duration) (*Payload, error) {
+func NewPayload(userID uint64, username string, duration time.Duration) (*Payload, error) {
 
 	payload := &Payload{
 		UserID:    userID,
-		Email:     email,
-		Role:      role,
+		Username:  username,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),
 	}

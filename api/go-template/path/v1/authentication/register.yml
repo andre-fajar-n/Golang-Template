@@ -1,0 +1,30 @@
+post:
+  tags: [authentication]
+  summary: 'Register'
+  description: 'Register user'
+  operationId: register
+  security: []
+  parameters:
+    - name: data
+      in: body
+      schema:
+        type: object
+        required:
+          - "username"
+          - "password"
+        properties: 
+          username:
+            type: string
+          password:
+            type: string
+            minLength: 8
+
+  responses:
+    200:
+      description: 'Success register'
+      schema:
+        $ref: './../../../definitions/authentication.yml#/definitions/successRegister'
+    default:
+      schema:
+        $ref: './../../../definitions/common.yml#/definitions/Error'
+      description: Server Error

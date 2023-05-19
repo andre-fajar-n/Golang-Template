@@ -47,27 +47,115 @@ func init() {
           "200": {
             "description": "Health Check",
             "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string"
-                }
+              "$ref": "#/definitions/success"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/login": {
+      "post": {
+        "security": [],
+        "description": "Login",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Login",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/loginParamsBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success login",
+            "schema": {
+              "$ref": "#/definitions/successLogin"
+            },
+            "headers": {
+              "token": {
+                "type": "string"
               }
             }
           },
           "default": {
             "description": "Server Error",
             "schema": {
-              "type": "object",
-              "properties": {
-                "code": {
-                  "type": "integer"
-                },
-                "message": {
-                  "type": "string",
-                  "example": "error"
-                }
-              }
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/profile": {
+      "get": {
+        "security": [
+          {
+            "authorization": []
+          }
+        ],
+        "description": "Find my user data",
+        "tags": [
+          "user"
+        ],
+        "summary": "Find My User Data",
+        "operationId": "findMyUserData",
+        "responses": {
+          "200": {
+            "description": "Success fetch data",
+            "schema": {
+              "$ref": "#/definitions/myUserData"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/register": {
+      "post": {
+        "security": [],
+        "description": "Register user",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Register",
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/registerParamsBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success register",
+            "schema": {
+              "$ref": "#/definitions/successRegister"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -75,24 +163,203 @@ func init() {
     }
   },
   "definitions": {
+    "customFields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      },
+      "x-go-package": "time"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string",
+          "example": "error"
+        }
+      }
+    },
+    "loginParamsBody": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "modelIdentifier": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "uint64"
+        }
+      }
+    },
+    "modelTrackTime": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:created_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:deleted_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:updated_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        }
+      }
+    },
+    "myUserData": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/customFields"
+        },
+        "username": {
+          "type": "string",
+          "x-omitempty": false
+        }
+      }
+    },
     "principal": {
       "type": "object",
       "properties": {
-        "email": {
-          "type": "string"
-        },
         "expired_at": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         },
         "user_id": {
           "type": "number",
           "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "registerParamsBody": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string",
+          "minLength": 8
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "success": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "successLogin": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/success"
+        },
+        {
+          "$ref": "#/definitions/successLoginAllOf1"
+        }
+      ]
+    },
+    "successLoginAllOf1": {
+      "type": "object",
+      "properties": {
+        "expired_at": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "models"
+    },
+    "successRegister": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/success"
+        },
+        {
+          "$ref": "#/definitions/successRegisterAllOf1"
+        }
+      ]
+    },
+    "successRegisterAllOf1": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "number",
+          "format": "uint64"
+        }
+      },
+      "x-go-gen-location": "models"
+    },
+    "user": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/modelIdentifier"
+        },
+        {
+          "$ref": "#/definitions/modelTrackTime"
+        },
+        {
+          "$ref": "#/definitions/userData"
+        }
+      ]
+    },
+    "userData": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/customFields"
+        },
+        "password": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "username": {
+          "type": "string",
+          "x-omitempty": false
         }
       }
     }
   },
   "securityDefinitions": {
-    "key": {
+    "authorization": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"
@@ -129,27 +396,115 @@ func init() {
           "200": {
             "description": "Health Check",
             "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string"
-                }
+              "$ref": "#/definitions/success"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/login": {
+      "post": {
+        "security": [],
+        "description": "Login",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Login",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/loginParamsBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success login",
+            "schema": {
+              "$ref": "#/definitions/successLogin"
+            },
+            "headers": {
+              "token": {
+                "type": "string"
               }
             }
           },
           "default": {
             "description": "Server Error",
             "schema": {
-              "type": "object",
-              "properties": {
-                "code": {
-                  "type": "integer"
-                },
-                "message": {
-                  "type": "string",
-                  "example": "error"
-                }
-              }
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/profile": {
+      "get": {
+        "security": [
+          {
+            "authorization": []
+          }
+        ],
+        "description": "Find my user data",
+        "tags": [
+          "user"
+        ],
+        "summary": "Find My User Data",
+        "operationId": "findMyUserData",
+        "responses": {
+          "200": {
+            "description": "Success fetch data",
+            "schema": {
+              "$ref": "#/definitions/myUserData"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/register": {
+      "post": {
+        "security": [],
+        "description": "Register user",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Register",
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/registerParamsBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success register",
+            "schema": {
+              "$ref": "#/definitions/successRegister"
+            }
+          },
+          "default": {
+            "description": "Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -157,24 +512,203 @@ func init() {
     }
   },
   "definitions": {
+    "customFields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      },
+      "x-go-package": "time"
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string",
+          "example": "error"
+        }
+      }
+    },
+    "loginParamsBody": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "modelIdentifier": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "uint64"
+        }
+      }
+    },
+    "modelTrackTime": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:created_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:deleted_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"column:updated_at\"",
+          "x-nullable": true,
+          "x-omitempty": false
+        }
+      }
+    },
+    "myUserData": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/customFields"
+        },
+        "username": {
+          "type": "string",
+          "x-omitempty": false
+        }
+      }
+    },
     "principal": {
       "type": "object",
       "properties": {
-        "email": {
-          "type": "string"
-        },
         "expired_at": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         },
         "user_id": {
           "type": "number",
           "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "registerParamsBody": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string",
+          "minLength": 8
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "success": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "successLogin": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/success"
+        },
+        {
+          "$ref": "#/definitions/successLoginAllOf1"
+        }
+      ]
+    },
+    "successLoginAllOf1": {
+      "type": "object",
+      "properties": {
+        "expired_at": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "models"
+    },
+    "successRegister": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/success"
+        },
+        {
+          "$ref": "#/definitions/successRegisterAllOf1"
+        }
+      ]
+    },
+    "successRegisterAllOf1": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "number",
+          "format": "uint64"
+        }
+      },
+      "x-go-gen-location": "models"
+    },
+    "user": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/modelIdentifier"
+        },
+        {
+          "$ref": "#/definitions/modelTrackTime"
+        },
+        {
+          "$ref": "#/definitions/userData"
+        }
+      ]
+    },
+    "userData": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "$ref": "#/definitions/customFields"
+        },
+        "password": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "username": {
+          "type": "string",
+          "x-omitempty": false
         }
       }
     }
   },
   "securityDefinitions": {
-    "key": {
+    "authorization": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"

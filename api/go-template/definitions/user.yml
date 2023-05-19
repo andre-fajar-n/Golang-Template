@@ -1,0 +1,21 @@
+definitions:
+  userData:
+    type: object
+    properties: 
+      username:
+        type: string
+        x-omitempty: false
+      password:
+        type: string
+        x-omitempty: false
+      note:
+        $ref: ./common.yml#/definitions/customFields
+
+  myUserData:
+    type: object
+    properties:
+      username:
+        type: string
+        x-omitempty: false
+      note:
+        $ref: ./common.yml#/definitions/customFields

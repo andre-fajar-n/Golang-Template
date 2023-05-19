@@ -17,6 +17,7 @@ type (
 		DBPort     int    `mapstructure:"DB_PORT"`
 
 		JwtSecret string `mapstructure:"JWT_SECRET"`
+		JwtExp    int    `mapstructure:"JWT_EXP"`
 	}
 )
 

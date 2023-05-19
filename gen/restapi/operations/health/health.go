@@ -6,12 +6,9 @@ package health
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 )
 
 // HealthHandlerFunc turns a function with the right signature into a health handler
@@ -58,82 +55,4 @@ func (o *Health) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
-}
-
-// HealthDefaultBody health default body
-//
-// swagger:model HealthDefaultBody
-type HealthDefaultBody struct {
-
-	// code
-	Code int64 `json:"code,omitempty"`
-
-	// message
-	// Example: error
-	Message string `json:"message,omitempty"`
-}
-
-// Validate validates this health default body
-func (o *HealthDefaultBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this health default body based on context it is used
-func (o *HealthDefaultBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *HealthDefaultBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *HealthDefaultBody) UnmarshalBinary(b []byte) error {
-	var res HealthDefaultBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
-}
-
-// HealthOKBody health o k body
-//
-// swagger:model HealthOKBody
-type HealthOKBody struct {
-
-	// message
-	Message string `json:"message,omitempty"`
-}
-
-// Validate validates this health o k body
-func (o *HealthOKBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this health o k body based on context it is used
-func (o *HealthOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *HealthOKBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *HealthOKBody) UnmarshalBinary(b []byte) error {
-	var res HealthOKBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
 }

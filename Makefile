@@ -6,7 +6,7 @@ validate:
 	swagger validate ./api/go-template/index.yml
 
 spec:
-	swagger expand --output=./api/go-template/result.yml --format=yaml ./api/go-template/index.yml
+	swagger flatten ./api/go-template/index.yml -o=./api/go-template/result.yml --format=yaml --with-flatten=full
 
 build: 
 	CGO_ENABLED=0 GOOS=linux go build -v -installsuffix cgo ./cmd/cli
@@ -21,8 +21,9 @@ doc: validate
 	swagger serve api/go-template/index.yml --no-open --host=0.0.0.0 --port=8080 --base-path=/
 
 clean:
+	# remove all files inside /gen/models except custom_fields_valuer_scanner.go
+	find ./gen/models -mindepth 1 -name custom_fields_valuer_scanner.go -prune -o -exec rm -rf {} +
 	rm -rf server
-	rm -rf ./gen/models
 	rm -rf ./gen/rest
 	go clean -i .
 

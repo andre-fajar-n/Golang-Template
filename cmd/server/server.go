@@ -5,6 +5,7 @@ import (
 	"go_template/gen/restapi"
 	"go_template/gen/restapi/operations"
 	"go_template/internal/handlers"
+	"go_template/internal/repositories"
 	"go_template/internal/rest"
 	"go_template/runtime"
 	"log"
@@ -64,7 +65,9 @@ func Main() {
 
 	rt := runtime.NewRuntime()
 
-	h := handlers.NewHandler()
+	userRepo := repositories.Newuser(*rt)
+
+	h := handlers.NewHandler(*rt, userRepo)
 
 	rest.Authorization(rt, api)
 	rest.Route(rt, api, h)

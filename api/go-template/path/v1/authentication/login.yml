@@ -1,0 +1,32 @@
+post:
+  tags: [authentication]
+  summary: 'Login'
+  description: 'Login'
+  operationId: login
+  security: []
+  parameters:
+    - name: data
+      in: body
+      schema:
+        type: object
+        required:
+          - "username"
+          - "password"
+        properties: 
+          username:
+            type: string
+          password:
+            type: string
+
+  responses:
+    201:
+      description: 'Success login'
+      schema:
+        $ref: './../../../definitions/authentication.yml#/definitions/successLogin'
+      headers:
+        token:
+          type: string
+    default:
+      schema:
+        $ref: './../../../definitions/common.yml#/definitions/Error'
+      description: Server Error

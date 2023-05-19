@@ -40,7 +40,7 @@ func (r *Runtime) db() *Runtime {
 		SkipDefaultTransaction: true,
 		Logger:                 dbLogger,
 		NamingStrategy: schema.NamingStrategy{
-			SingularTable: false,
+			SingularTable: true,
 		},
 	}
 

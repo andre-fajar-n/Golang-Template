@@ -6,7 +6,7 @@ schemes: [http]
 consumes: [application/json, multipart/form-data]
 produces: [application/json]
 securityDefinitions:
-  key:
+  authorization:
     type: apiKey
     in: header
     name: Authorization
@@ -16,14 +16,32 @@ paths:
   /health:
     $ref: ./path/v1/health/health.yml
 
+  # authentication
+  /v1/register:
+    $ref: ./path/v1/authentication/register.yml
+
+  /v1/login:
+    $ref: ./path/v1/authentication/login.yml
+
+  # user
+  /v1/profile:
+    $ref: ./path/v1/user/profile.yml
+
 definitions:
   principal:
     type: object
     properties:
-      email:
+      username:
         type: string
       user_id:
         type: number
         format: uint64
       expired_at:
         type: string
+        format: date-time
+
+  user:
+    allOf:
+      - $ref: "./definitions/common.yml#/definitions/ModelIdentifier"
+      - $ref: "./definitions/common.yml#/definitions/ModelTrackTime"
+      - $ref: "./definitions/user.yml#/definitions/userData"

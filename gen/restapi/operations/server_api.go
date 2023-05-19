@@ -19,7 +19,10 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"go_template/gen/models"
+	"go_template/gen/restapi/operations/authentication"
 	"go_template/gen/restapi/operations/health"
+	"go_template/gen/restapi/operations/user"
 )
 
 // NewServerAPI creates a new Server instance
@@ -45,9 +48,25 @@ func NewServerAPI(spec *loads.Document) *ServerAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		UserFindMyUserDataHandler: user.FindMyUserDataHandlerFunc(func(params user.FindMyUserDataParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation user.FindMyUserData has not yet been implemented")
+		}),
 		HealthHealthHandler: health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 			return middleware.NotImplemented("operation health.Health has not yet been implemented")
 		}),
+		AuthenticationLoginHandler: authentication.LoginHandlerFunc(func(params authentication.LoginParams) middleware.Responder {
+			return middleware.NotImplemented("operation authentication.Login has not yet been implemented")
+		}),
+		AuthenticationRegisterHandler: authentication.RegisterHandlerFunc(func(params authentication.RegisterParams) middleware.Responder {
+			return middleware.NotImplemented("operation authentication.Register has not yet been implemented")
+		}),
+
+		// Applies when the "Authorization" header is set
+		AuthorizationAuth: func(token string) (*models.Principal, error) {
+			return nil, errors.NotImplemented("api key auth (authorization) Authorization from header param [Authorization] has not yet been implemented")
+		},
+		// default authorizer is authorized meaning no requests are blocked
+		APIAuthorizer: security.Authorized(),
 	}
 }
 
@@ -87,8 +106,21 @@ type ServerAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// AuthorizationAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	AuthorizationAuth func(string) (*models.Principal, error)
+
+	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
+	APIAuthorizer runtime.Authorizer
+
+	// UserFindMyUserDataHandler sets the operation handler for the find my user data operation
+	UserFindMyUserDataHandler user.FindMyUserDataHandler
 	// HealthHealthHandler sets the operation handler for the health operation
 	HealthHealthHandler health.HealthHandler
+	// AuthenticationLoginHandler sets the operation handler for the login operation
+	AuthenticationLoginHandler authentication.LoginHandler
+	// AuthenticationRegisterHandler sets the operation handler for the register operation
+	AuthenticationRegisterHandler authentication.RegisterHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -169,8 +201,21 @@ func (o *ServerAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.AuthorizationAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
+	}
+
+	if o.UserFindMyUserDataHandler == nil {
+		unregistered = append(unregistered, "user.FindMyUserDataHandler")
+	}
 	if o.HealthHealthHandler == nil {
 		unregistered = append(unregistered, "health.HealthHandler")
+	}
+	if o.AuthenticationLoginHandler == nil {
+		unregistered = append(unregistered, "authentication.LoginHandler")
+	}
+	if o.AuthenticationRegisterHandler == nil {
+		unregistered = append(unregistered, "authentication.RegisterHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -187,12 +232,23 @@ func (o *ServerAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, 
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
 func (o *ServerAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
-	return nil
+	result := make(map[string]runtime.Authenticator)
+	for name := range schemes {
+		switch name {
+		case "authorization":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
+				return o.AuthorizationAuth(token)
+			})
+
+		}
+	}
+	return result
 }
 
 // Authorizer returns the registered authorizer
 func (o *ServerAPI) Authorizer() runtime.Authorizer {
-	return nil
+	return o.APIAuthorizer
 }
 
 // ConsumersFor gets the consumers for the specified media types.
@@ -265,7 +321,19 @@ func (o *ServerAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/v1/profile"] = user.NewFindMyUserData(o.context, o.UserFindMyUserDataHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/health"] = health.NewHealth(o.context, o.HealthHealthHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v1/login"] = authentication.NewLogin(o.context, o.AuthenticationLoginHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v1/register"] = authentication.NewRegister(o.context, o.AuthenticationRegisterHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

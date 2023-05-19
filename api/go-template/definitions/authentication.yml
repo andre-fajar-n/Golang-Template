@@ -1,0 +1,17 @@
+definitions:
+  successLogin:
+    allOf:
+      - $ref: './common.yml#/definitions/Success'
+      - type: object
+        properties:
+          expired_at:
+            type: string
+
+  successRegister:
+    allOf:
+      - $ref: './common.yml#/definitions/Success'
+      - type: object
+        properties:
+          user_id:
+            type: number
+            format: uint64

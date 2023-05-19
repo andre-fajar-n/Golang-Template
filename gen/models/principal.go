@@ -8,8 +8,10 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Principal principal
@@ -17,18 +19,40 @@ import (
 // swagger:model principal
 type Principal struct {
 
-	// email
-	Email string `json:"email,omitempty"`
-
 	// expired at
-	ExpiredAt string `json:"expired_at,omitempty"`
+	// Format: date-time
+	ExpiredAt strfmt.DateTime `json:"expired_at,omitempty"`
 
 	// user id
 	UserID uint64 `json:"user_id,omitempty"`
+
+	// username
+	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this principal
 func (m *Principal) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateExpiredAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Principal) validateExpiredAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.ExpiredAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("expired_at", "body", "date-time", m.ExpiredAt.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 

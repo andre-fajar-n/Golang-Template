@@ -5,12 +5,11 @@ import (
 	"go_template/gen/restapi/operations"
 	"go_template/internal/utils/jwt"
 	"go_template/runtime"
-	"time"
 
-	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 )
 
-func parseToken(rt *runtime.Runtime, token string) (*jwt.Payload, error) {
+func parseToken(rt *runtime.Runtime, token string) (*models.Principal, error) {
 	secret := rt.Cfg.JwtSecret
 	maker, err := jwt.NewJWTMaker(secret)
 	if err != nil {
@@ -22,35 +21,15 @@ func parseToken(rt *runtime.Runtime, token string) (*jwt.Payload, error) {
 		return nil, rt.SetError(401, "Unauthorized: invalid API key token: %v", err)
 	}
 
-	return payload, nil
-}
-
-func verifySingleRole(payload *jwt.Payload, role string) (*models.Principal, error) {
-	if payload.Role != role {
-		return nil, errors.New(403, "Forbidden: insufficient API key privileges")
-	}
-
 	return &models.Principal{
+		ExpiredAt: strfmt.DateTime(payload.ExpiredAt),
 		UserID:    payload.UserID,
-		ExpiredAt: payload.ExpiredAt.Format(time.RFC3339),
-		Email:     payload.Email,
+		Username:  payload.Username,
 	}, nil
 }
 
-func checkHasRole(rt *runtime.Runtime, role, token string) (*models.Principal, error) {
-	payload, err := parseToken(rt, token)
-	if err != nil {
-		return nil, err
-	}
-
-	p, err := verifySingleRole(payload, role)
-	if err != nil {
-		return nil, err
-	}
-
-	return p, nil
-}
-
 func Authorization(rt *runtime.Runtime, api *operations.ServerAPI) {
-
+	api.AuthorizationAuth = func(token string) (*models.Principal, error) {
+		return parseToken(rt, token)
+	}
 }

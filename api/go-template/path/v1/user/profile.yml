@@ -1,0 +1,16 @@
+get:
+  tags: [user]
+  summary: "Find My User Data"
+  description: "Find my user data"
+  operationId: findMyUserData
+  security:
+    - authorization: []
+  responses:
+    200:
+      description: "Success fetch data"
+      schema:
+        $ref: "./../../../definitions/user.yml#/definitions/myUserData"
+    default:
+      schema:
+        $ref: "./../../../definitions/common.yml#/definitions/Error"
+      description: Server Error
