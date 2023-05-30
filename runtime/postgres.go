@@ -66,7 +66,7 @@ func (r *Runtime) MigrateDown() {
 }
 
 func (r *Runtime) prepareMigration(migrationType string) {
-	r.Logger.Info().Msgf("Initiate db migration %s")
+	r.Logger.Info().Msgf("Initiate db migration %s", migrationType)
 
 	m := r.prepareMigrator()
 	defer m.Close()

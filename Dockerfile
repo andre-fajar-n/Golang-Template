@@ -26,8 +26,8 @@ RUN apk update && apk add tzdata
 
 WORKDIR /app
 
-COPY --from=builder /app/application-tracker-server /app/application-tracker-server
+COPY --from=builder /app/cli /app/cli
 
 EXPOSE 8080
 
-CMD [ "./application-tracker-server", "--port=8080", "--host=0.0.0.0" ]
+CMD [ "./cli", "--port=8080", "--host=0.0.0.0" ]

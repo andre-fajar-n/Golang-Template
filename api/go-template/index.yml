@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: '1.0.0'
-  title: application-tracker
+  title: Golang Template
 schemes: [http]
 consumes: [application/json, multipart/form-data]
 produces: [application/json]

@@ -7,18 +7,73 @@ schemes:
     - http
 swagger: "2.0"
 info:
-    title: application-tracker
+    title: Golang Template
     version: 1.0.0
 paths:
-    /v1/login:
+    /v1/profile:
+        get:
+            summary: Find My User Data
+            operationId: findMyUserData
+            responses:
+                "200":
+                    description: Success fetch data
+                    schema:
+                        $ref: '#/definitions/myUserData'
+                default:
+                    description: Server Error
+                    schema:
+                        $ref: '#/definitions/error'
+            security:
+                - authorization: []
+            description: Find my user data
+            tags:
+                - user
+    /v1/register:
         post:
-            summary: Login
-            operationId: login
+            summary: Register
+            operationId: register
             parameters:
                 - name: data
                   in: body
                   schema:
+                    $ref: '#/definitions/registerParamsBody'
+            responses:
+                "200":
+                    description: Success register
+                    schema:
+                        $ref: '#/definitions/successRegister'
+                default:
+                    schema:
+                        $ref: '#/definitions/error'
+                    description: Server Error
+            security: []
+            description: Register user
+            tags:
+                - authentication
+    /health:
+        get:
+            description: Check if the App is Running
+            tags:
+                - health
+            summary: Health Check
+            operationId: health
+            responses:
+                "200":
+                    description: Health Check
+                    schema:
+                        $ref: '#/definitions/success'
+                default:
+                    schema:
+                        $ref: '#/definitions/error'
+                    description: Server Error
+            security: []
+    /v1/login:
+        post:
+            parameters:
+                - in: body
+                  schema:
                     $ref: '#/definitions/loginParamsBody'
+                  name: data
             responses:
                 "201":
                     description: Success login
@@ -35,108 +90,68 @@ paths:
             description: Login
             tags:
                 - authentication
-    /v1/profile:
-        get:
-            operationId: findMyUserData
-            responses:
-                default:
-                    description: Server Error
-                    schema:
-                        $ref: '#/definitions/error'
-                "200":
-                    schema:
-                        $ref: '#/definitions/myUserData'
-                    description: Success fetch data
-            security:
-                - authorization: []
-            description: Find my user data
-            tags:
-                - user
-            summary: Find My User Data
-    /v1/register:
-        post:
-            security: []
-            description: Register user
-            tags:
-                - authentication
-            summary: Register
-            operationId: register
-            parameters:
-                - name: data
-                  in: body
-                  schema:
-                    $ref: '#/definitions/registerParamsBody'
-            responses:
-                "200":
-                    description: Success register
-                    schema:
-                        $ref: '#/definitions/successRegister'
-                default:
-                    description: Server Error
-                    schema:
-                        $ref: '#/definitions/error'
-    /health:
-        get:
-            description: Check if the App is Running
-            tags:
-                - health
-            summary: Health Check
-            operationId: health
-            responses:
-                "200":
-                    schema:
-                        $ref: '#/definitions/success'
-                    description: Health Check
-                default:
-                    description: Server Error
-                    schema:
-                        $ref: '#/definitions/error'
-            security: []
+            summary: Login
+            operationId: login
 definitions:
-    myUserData:
+    customFields:
         type: object
-        properties:
-            note:
-                $ref: '#/definitions/customFields'
-            username:
-                type: string
-                x-omitempty: false
-    userData:
+        additionalProperties:
+            type: object
+        x-go-package: time
+    registerParamsBody:
+        x-go-gen-location: operations
         type: object
+        required:
+            - username
+            - password
         properties:
-            note:
-                $ref: '#/definitions/customFields'
             password:
                 type: string
-                x-omitempty: false
+                minLength: !!float 8
             username:
-                x-omitempty: false
                 type: string
-    successLoginAllOf1:
+    success:
         type: object
+        properties:
+            message:
+                type: string
+    successLogin:
+        allOf:
+            - $ref: '#/definitions/success'
+            - $ref: '#/definitions/successLoginAllOf1'
+    successLoginAllOf1:
         properties:
             expired_at:
                 type: string
         x-go-gen-location: models
-    successRegister:
-        allOf:
-            - $ref: '#/definitions/success'
-            - $ref: '#/definitions/successRegisterAllOf1'
+        type: object
     successRegisterAllOf1:
         type: object
         properties:
             user_id:
-                type: number
                 format: uint64
+                type: number
         x-go-gen-location: models
     error:
         properties:
-            code:
-                type: integer
             message:
                 type: string
                 example: error
+            code:
+                type: integer
         type: object
+    myUserData:
+        properties:
+            note:
+                $ref: '#/definitions/customFields'
+            username:
+                type: string
+                x-omitempty: false
+        type: object
+    successRegister:
+        allOf:
+            - $ref: '#/definitions/success'
+            - $ref: '#/definitions/successRegisterAllOf1'
     loginParamsBody:
         type: object
         required:
@@ -148,79 +163,64 @@ definitions:
             username:
                 type: string
         x-go-gen-location: operations
+    modelTrackTime:
+        type: object
+        properties:
+            updated_at:
+                x-nullable: true
+                x-omitempty: false
+                type: string
+                format: date-time
+                x-go-custom-tag: gorm:"column:updated_at"
+            created_at:
+                x-nullable: true
+                x-omitempty: false
+                type: string
+                format: date-time
+                x-go-custom-tag: gorm:"column:created_at"
+            deleted_at:
+                format: date-time
+                x-go-custom-tag: gorm:"column:deleted_at"
+                x-nullable: true
+                x-omitempty: false
+                type: string
+    user:
+        allOf:
+            - $ref: '#/definitions/modelIdentifier'
+            - $ref: '#/definitions/modelTrackTime'
+            - $ref: '#/definitions/userData'
     modelIdentifier:
+        type: object
         required:
             - id
         properties:
             id:
                 type: integer
                 format: uint64
-        type: object
-    modelTrackTime:
-        type: object
-        properties:
-            created_at:
-                x-go-custom-tag: gorm:"column:created_at"
-                x-nullable: true
-                x-omitempty: false
-                type: string
-                format: date-time
-            deleted_at:
-                x-nullable: true
-                x-omitempty: false
-                type: string
-                format: date-time
-                x-go-custom-tag: gorm:"column:deleted_at"
-            updated_at:
-                x-omitempty: false
-                type: string
-                format: date-time
-                x-go-custom-tag: gorm:"column:updated_at"
-                x-nullable: true
     principal:
         type: object
         properties:
-            user_id:
-                type: number
-                format: uint64
-            username:
-                type: string
             expired_at:
                 type: string
                 format: date-time
-    success:
-        properties:
-            message:
+            user_id:
+                format: uint64
+                type: number
+            username:
                 type: string
+    userData:
         type: object
-    customFields:
-        additionalProperties:
-            type: object
-        x-go-package: time
-        type: object
-    registerParamsBody:
-        type: object
-        required:
-            - username
-            - password
         properties:
             password:
                 type: string
-                minLength: !!float 8
+                x-omitempty: false
             username:
                 type: string
-        x-go-gen-location: operations
-    successLogin:
-        allOf:
-            - $ref: '#/definitions/success'
-            - $ref: '#/definitions/successLoginAllOf1'
-    user:
-        allOf:
-            - $ref: '#/definitions/modelIdentifier'
-            - $ref: '#/definitions/modelTrackTime'
-            - $ref: '#/definitions/userData'
+                x-omitempty: false
+            note:
+                $ref: '#/definitions/customFields'
 securityDefinitions:
     authorization:
+        in: header
         type: apiKey
         name: Authorization
-        in: header
